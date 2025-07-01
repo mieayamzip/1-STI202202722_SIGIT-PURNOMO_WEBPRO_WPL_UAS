@@ -1,4 +1,4 @@
-#📋 Website CRUD Survey
+# Website CRUD Survey
 Ini adalah website CRUD Survey berbasis Laravel yang saya buat untuk kebutuhan pembelajaran dan pengembangan skill backend dan frontend saya. Website ini memungkinkan user untuk:
 
 Membuat, membaca, memperbarui, dan menghapus data survey.
