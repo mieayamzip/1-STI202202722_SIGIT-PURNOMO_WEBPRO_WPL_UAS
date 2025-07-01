@@ -15,10 +15,12 @@ class DataKendaraanController extends Controller
         return view('kendaraan.index', compact('kendaraans'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $survey = Survey::latest()->first();
+        $survey_id = $request->survey;
+        $survey = Survey::findOrFail($survey_id);
         $jenis_kendaraan = JenisKendaraan::all();
+
         return view('kendaraan.form', compact('survey', 'jenis_kendaraan'));
     }
 
@@ -37,6 +39,31 @@ class DataKendaraanController extends Controller
                 'jumlah_kendaraan' => $kendaraan['jumlah_kendaraan'],
             ]);
         }
+
+        return app(\App\Http\Controllers\SkorController::class)->store(new \Illuminate\Http\Request(['survey_id' => $request->survey_id]));
+    }
+
+    public function edit(DataKendaraan $kendaraan)
+    {
+        $survey = $kendaraan->survey;
+        $jenis_kendaraan = JenisKendaraan::all();
+
+        return view('kendaraan.form', compact('kendaraan', 'survey', 'jenis_kendaraan'));
+    }
+
+    public function update(Request $request, DataKendaraan $kendaraan)
+    {
+        $request->validate([
+            'survey_id' => 'required|exists:surveys,id',
+            'jenis_kendaraan_id' => 'required|exists:jenis_kendaraan,id',
+            'jumlah_kendaraan' => 'required|integer|min:0',
+        ]);
+
+        $kendaraan->update([
+            'survey_id' => $request->survey_id,
+            'jenis_kendaraan_id' => $request->jenis_kendaraan_id,
+            'jumlah_kendaraan' => $request->jumlah_kendaraan,
+        ]);
 
         return app(\App\Http\Controllers\SkorController::class)->store(new \Illuminate\Http\Request(['survey_id' => $request->survey_id]));
     }

@@ -74,4 +74,40 @@ class SurveyController extends Controller
     {
         return view('surveys.show', compact('survey'));
     }
+    public function edit(Survey $survey)
+    {
+        return view('surveys.form', compact('survey'));
+    }
+
+    public function update(Request $request, Survey $survey)
+    {
+        $request->validate([
+            'nik' => 'required|unique:surveys,nik,' . $survey->id,
+            'nama_lengkap' => 'required|string|max:255',
+            'tempat_lahir' => 'required|string|max:255',
+            'tanggal_lahir' => 'required|date',
+            'alamat' => 'required|string',
+            'nomor_telepon' => 'required|string|max:20',
+        ]);
+
+        $survey->update([
+            'nik' => $request->nik,
+            'nama_lengkap' => $request->nama_lengkap,
+            'tempat_lahir' => $request->tempat_lahir,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'alamat' => $request->alamat,
+            'nomor_telepon' => $request->nomor_telepon,
+        ]);
+
+        // Cek data keluarga
+        $keluarga = \App\Models\DataKeluarga::where('survey_id', $survey->id)->first();
+
+        if ($keluarga) {
+            // Redirect ke edit data keluarga jika ADA
+            return redirect()->route('keluarga.edit', $keluarga->id);
+        } else {
+            // Jika TIDAK ADA, kembalikan dengan error
+            return redirect()->back()->with('error', 'Data keluarga belum dibuat. Tidak dapat mengedit.');
+        }
+    }
 }
